@@ -1,6 +1,7 @@
 package com.psychotalk.service;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.psychotalk.model.JwtUtil;
 import com.psychotalk.model.Users;
 import com.psychotalk.repository.UserRepo;
 import org.json.simple.JSONObject;
@@ -54,15 +55,21 @@ public class UsersService {
 
     public String userLogin(Users user){
         Users dbUser = userRepo.findByUserEmailAndUserPassword(user.getEmail() , user.getPassword());
+        JSONObject json = new JSONObject();
         if(dbUser != null){
-            JSONObject json = new JSONObject();
-            json.put("id",dbUser.getId());
-            json.put("username",dbUser.getUsername());
-            json.put("email",dbUser.getEmail());
-            json.put("phone",dbUser.getPhone());
-            json.put("age" , dbUser.getAge());
-            json.put("gender" , dbUser.getGender());
-            return  "{\"status\":\"success\", \"user\" : "+json+"}";
+            String token = JwtUtil.generateToken(dbUser.getEmail());
+
+            JSONObject userJson = new JSONObject();
+            userJson.put("id",dbUser.getId());
+            userJson.put("username",dbUser.getUsername());
+            userJson.put("email",dbUser.getEmail());
+            userJson.put("phone",dbUser.getPhone());
+            userJson.put("age" , dbUser.getAge());
+            userJson.put("gender" , dbUser.getGender());
+            json.put("status" , "success");
+            json.put("token" , token);
+            json.put("user", userJson);
+            return  json.toString();
 
         }else{
             return "{\"status\":\"failure\",\"errorMsg\":\"Incorrect Username or password\"}";
