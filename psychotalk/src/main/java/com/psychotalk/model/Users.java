@@ -1,7 +1,11 @@
 package com.psychotalk.model;
 
+import com.psychotalk.repository.QuestionRepo;
+import com.psychotalk.service.QuestionService;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.naming.Context;
 import java.time.LocalDateTime;
 import java.util.Date;
 

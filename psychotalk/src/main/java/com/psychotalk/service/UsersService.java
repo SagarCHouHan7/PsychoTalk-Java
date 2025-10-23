@@ -3,9 +3,12 @@ package com.psychotalk.service;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.psychotalk.model.JwtUtil;
 import com.psychotalk.model.Users;
+import com.psychotalk.repository.AnswerRepo;
+import com.psychotalk.repository.QuestionRepo;
 import com.psychotalk.repository.UserRepo;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -22,6 +25,11 @@ public class UsersService {
     @Autowired
     UserRepo userRepo;
 
+    @Autowired
+    QuestionRepo questionRepo;
+
+    @Autowired
+    AnswerRepo answerRepo;
     public String userRegistration(Users user){
         System.out.println("UsersService userRegistration "+user);
         //email and username already exists error
@@ -55,22 +63,8 @@ public class UsersService {
 
     public String userLogin(Users user){
         Users dbUser = userRepo.findByUserEmailAndUserPassword(user.getEmail() , user.getPassword());
-        JSONObject json = new JSONObject();
         if(dbUser != null){
-            String token = JwtUtil.generateToken(dbUser.getEmail());
-
-            JSONObject userJson = new JSONObject();
-            userJson.put("id",dbUser.getId());
-            userJson.put("username",dbUser.getUsername());
-            userJson.put("email",dbUser.getEmail());
-            userJson.put("phone",dbUser.getPhone());
-            userJson.put("age" , dbUser.getAge());
-            userJson.put("gender" , dbUser.getGender());
-            json.put("status" , "success");
-            json.put("token" , token);
-            json.put("user", userJson);
-            return  json.toString();
-
+            return  getUserJson(dbUser);
         }else{
             return "{\"status\":\"failure\",\"errorMsg\":\"Incorrect Username or password\"}";
         }
@@ -103,4 +97,46 @@ public class UsersService {
             }
         }
     }
+
+    public String getUserById(int userId) {
+        Users dbUser = userRepo.getUserById(userId);
+        if(dbUser != null){
+            return  getUserJson(dbUser);
+        }else{
+            return "{\"status\":\"failure\",\"errorMsg\":\"Incorrect Username or password\"}";
+        }
+
+    }
+
+    private String getUserJson(Users dbUser){
+        JSONObject json = new JSONObject();
+        JSONObject userJson = new JSONObject();
+        userJson.put("id",dbUser.getId());
+        userJson.put("username",dbUser.getUsername());
+        userJson.put("email",dbUser.getEmail());
+        userJson.put("phone",dbUser.getPhone());
+        userJson.put("age" , dbUser.getAge());
+        userJson.put("gender" , dbUser.getGender());
+        userJson.put("questionsCount", questionRepo.getQuestionsCountByUserId(dbUser.getId()));
+        userJson.put("answersCount" , answerRepo.getAnswersCountByUserId(dbUser.getId()));
+        String token = JwtUtil.generateToken(dbUser.getEmail());
+        json.put("token" , token);
+        json.put("status" , "success");
+        json.put("user", userJson);
+
+        return  json.toString();
+    }
 }
+
+
+//            ResponseCookie cookie = ResponseCookie.from("token", token)
+//                    .httpOnly(true)   // JavaScript can't access
+//                    .secure(false)    //  set true in production (HTTPS)
+//                    .path("/")        // cookie available for entire API
+//                    .sameSite("Lax")  // prevent CSRF
+//                    .maxAge(24 * 60 * 60) // 1 day expiry
+//                    .build();
+//
+//            // 3️⃣ Add cookie to response
+//            response.addHeader("Set-Cookie", cookie.toString());
+

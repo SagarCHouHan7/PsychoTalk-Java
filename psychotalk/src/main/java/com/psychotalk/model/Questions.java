@@ -18,6 +18,7 @@ public class Questions {
     private int rating;
 
     private  int userId;
+    private String username;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answers> answerList;
@@ -68,6 +69,14 @@ public class Questions {
 
     public void setAnswerList(List<Answers> answerList) {
         this.answerList = answerList;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

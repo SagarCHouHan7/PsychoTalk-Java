@@ -2,10 +2,12 @@ package com.psychotalk.controller;
 
 import com.psychotalk.model.Users;
 import com.psychotalk.service.UsersService;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+
 @RestController()
 @RequestMapping("User")
 public class UserController {
@@ -21,6 +23,11 @@ public class UserController {
     @PostMapping("/login")
     private String userLogin(@RequestBody Users user){
         return usersService.userLogin(user);
+    }
+
+    @GetMapping("/getUserById/{id}")
+    private String userLogin(@PathVariable("id") int userId){
+        return usersService.getUserById(userId);
     }
 
     @PutMapping("/updateUser")

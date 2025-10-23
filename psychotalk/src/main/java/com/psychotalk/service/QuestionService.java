@@ -100,6 +100,9 @@ public class QuestionService {
     }
 
 
+    public int getQuestionsCountByUserId(int userId){
+        return this.questionRepo.getQuestionsCountByUserId(userId);
+    }
 
 
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/question")
 public class QuestionController {
@@ -42,7 +43,7 @@ public class QuestionController {
         return questionService.updateQuestionById(question);
     }
 
-    @GetMapping("/deleteById/{id}")
+    @DeleteMapping("/deleteById/{id}")
     private boolean deleteById(@PathVariable("id") int id){
         return questionService.deleteById(id);
     }

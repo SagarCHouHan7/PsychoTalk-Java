@@ -19,4 +19,7 @@ public interface QuestionRepo extends JpaRepository<Questions , Integer> {
 
     @Query("SELECT q FROM Questions q WHERE q.userId=:userId")
     List<Questions> getQuestionsByUserId(@Param("userId") int userId );
+
+    @Query("SELECT count(*) FROM Questions q WHERE q.userId=:userId")
+    int getQuestionsCountByUserId(@Param("userId") int userId );
 }

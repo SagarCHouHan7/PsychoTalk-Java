@@ -19,6 +19,8 @@ public interface AnswerRepo extends JpaRepository<Answers , Integer> {
     @Query(" SELECT a FROM Answers a WHERE a.id=:id ")
     Answers findAnswerStatementByAnswerId(@Param("id") int id);
 
+    @Query("SELECT count(*) FROM Answers a WHERE a.user.id=:userId")
+    int getAnswersCountByUserId(@Param("userId") int userId );
 //    @Modifying
 //    @Transactional
 //    @Query("DELETE  FROM Answers a WHERE a.user.id=:userId AND a.question.id=:questionId")
