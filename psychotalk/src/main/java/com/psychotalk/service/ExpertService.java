@@ -1,6 +1,7 @@
 package com.psychotalk.service;
 
 import com.psychotalk.model.Experts;
+import com.psychotalk.model.JwtUtil;
 import com.psychotalk.repository.ExpertRepo;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,19 +46,14 @@ public class ExpertService {
         Experts dbExpert = expertRepo.findExpertByEmailAndPassword(expert.getEmail() , expert.getPassword());
         JSONObject json = new JSONObject();
         if(dbExpert != null){
-            json.put("email" , dbExpert.getEmail());
-            json.put("fullName" , dbExpert.getFullName());
-            json.put("about" , dbExpert.getAbout());
-            json.put("gender" , dbExpert.getGender());
-            json.put("age" , dbExpert.getAge());
-            json.put("qualification" , dbExpert.getQualification());
-            json.put("experience" , dbExpert.getExperience());
-            json.put("fees" , dbExpert.getFees());
-            json.put("address" , dbExpert.getAddress());
-            json.put("rating" , dbExpert.getRating());
-
+            String token = JwtUtil.generateToken(dbExpert.getEmail());
+            json.put("token" , token);
+            Experts loggedInExpert = expertRepo.getExpertByExpertId(dbExpert.getId());
+            json.put("expert" , loggedInExpert);
+            json.put("status" , "success");
         }
         else{
+
             json.put("status" , "failure");
             json.put("errorMsg" , "Incorrect UserName or Password");
         }

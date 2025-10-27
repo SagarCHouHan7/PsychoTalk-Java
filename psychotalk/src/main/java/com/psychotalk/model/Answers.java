@@ -15,6 +15,8 @@ public class Answers {
     @JoinColumn(name = "user_id" , nullable = false)
     @OneToOne
     private Users user;
+
+    @Column(name="answer", length = 2000)
     private String answer;
 
     @ManyToOne

@@ -15,7 +15,7 @@ public class Questions {
     private String question;
     private Date createdTime;
     private Date modifiedTime;
-    private int rating;
+    private int likes;
 
     private  int userId;
     private String username;
@@ -47,12 +47,12 @@ public class Questions {
         this.modifiedTime = modifiedTime;
     }
 
-    public int getRating() {
-        return rating;
+    public int getLikes() {
+        return likes;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setLikes(int likes) {
+        this.likes = likes;
     }
 
     public int getUserId() {
@@ -79,16 +79,6 @@ public class Questions {
         this.username = username;
     }
 
-    @Override
-    public String toString() {
-        return "Questions{" +
-                "id=" + id +
-                ", question='" + question + '\'' +
-                ", createdTime=" + createdTime +
-                ", modifiedTime=" + modifiedTime +
-                ", rating=" + rating +
-                ", userId=" + userId +
-                ", answerList=" + answerList +
-                '}';
-    }
+
+
 }
