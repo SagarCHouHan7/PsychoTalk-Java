@@ -1,52 +1,45 @@
 package com.psychotalk.controller;
 
-import com.psychotalk.model.Questions;
+import com.psychotalk.dto.questionDto.CreateQuestionDto;
+import com.psychotalk.dto.questionDto.QuestionResponseDto;
 import com.psychotalk.service.QuestionService;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-@RequestMapping("/question")
+@RequestMapping("/user/question")
 public class QuestionController {
 
     @Autowired
     QuestionService questionService;
-    @PostMapping("/createQuestion")
-    private JSONObject createQuestion(@RequestBody Questions question){
-        return questionService.createQuestion(question);
+
+    @PostMapping("/post")
+    private ResponseEntity<?> createQuestion(@RequestBody CreateQuestionDto question){
+        QuestionResponseDto question1 = questionService.createQuestion(question);
+        if(question1 != null)
+            return new ResponseEntity<>(question1 , HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/getQuestionById")
-    private Questions getQuestionById(@RequestParam int id){
-        return questionService.getQuestionById(id);
-
+    @GetMapping("/getMy")
+    private ResponseEntity<?> getMyQuestions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ){
+        return ResponseEntity.ok(questionService.getMyQuestions(page , size));
     }
 
-    @GetMapping("/getAllQuestions")
-    private List<Questions> getAllQuestions(){
-
-        return questionService.getAllQuestions();
+    @PutMapping("/update/{id}")
+    private ResponseEntity<QuestionResponseDto> updateQuestionById(@PathVariable("id") long id , @RequestBody CreateQuestionDto question){
+        return ResponseEntity.ok(questionService.updateQuestionById(id , question.getQuestion()));
     }
 
-    @GetMapping("/getQuestionByUserId")
-    private List<Questions> getQuestionsByUserId(@RequestParam("id") int userId){
-        return questionService.getQuestionsByUserId(userId);
+    @DeleteMapping("/{id}")
+    private ResponseEntity<Void> deleteById(@PathVariable("id") Long id){
+        questionService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/updateQuestionById")
-    private JSONObject updateQuestionById(@RequestBody Questions question){
-        return questionService.updateQuestionById(question);
-    }
-
-    @DeleteMapping("/deleteById/{id}")
-    private boolean deleteById(@PathVariable("id") int id){
-        return questionService.deleteById(id);
-    }
-
-
 }

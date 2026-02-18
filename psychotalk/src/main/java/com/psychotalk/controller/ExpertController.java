@@ -1,38 +1,32 @@
 package com.psychotalk.controller;
 
-import com.psychotalk.model.Experts;
+import com.psychotalk.dto.expertDto.ExpertVerificationRequestDto;
+import com.psychotalk.dto.expertDto.ExpertProfileDto;
+import com.psychotalk.dto.expertDto.VerificationResponseDto;
 import com.psychotalk.service.ExpertService;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
-import java.util.List;
-
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
-@RequestMapping("/Expert")
+@RequestMapping("/expert")
 public class ExpertController {
 
     @Autowired
     ExpertService expertService;
 
-    @PostMapping("/register")
-    public String expertRegistration(@RequestBody Experts expert){
-        return expertService.expertRegistration(expert);
+    @PostMapping(value = "/getVerified" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<VerificationResponseDto> getVerified(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("data") ExpertVerificationRequestDto dto) throws IOException {
+        return ResponseEntity.ok(expertService.getVerified(file , dto));
     }
 
-    @PostMapping("/login")
-    public JSONObject expertLogin(@RequestBody Experts expert){
-        return expertService.getExpertByEmailAndPassword(expert);
-    }
-
-    @GetMapping("/getAllExperts")
-    public List<Experts> getAllExperts(){
-        return expertService.getAllExpertsProfile();
-    }
-
-    @GetMapping("/getExpertByExpertId/{id}")
-    public Experts getExpertByExpertId(@PathVariable("id") Integer expertId){
-        return expertService.getExpertByExpertId(expertId);
+    @GetMapping("/myProfile")
+    public ResponseEntity<ExpertProfileDto> getMyProfile(){
+        return ResponseEntity.ok(expertService.getMyProfile());
     }
 }

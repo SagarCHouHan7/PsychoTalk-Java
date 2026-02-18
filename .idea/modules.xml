@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/psychotalk.iml" filepath="$PROJECT_DIR$/.idea/psychotalk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/psychotalk/psychotalk.iml" filepath="$PROJECT_DIR$/psychotalk/psychotalk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/psychotalk-backend.iml" filepath="$PROJECT_DIR$/.idea/psychotalk-backend.iml" />
     </modules>
   </component>
 </project>
