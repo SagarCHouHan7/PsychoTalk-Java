@@ -17,8 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -135,56 +133,4 @@ public class ExpertService {
     }
 
 
-//    public String expertRegistration(Experts expert) {
-//        Experts dbExpert = expertRepoOld.findExpertByEmailAndPassword(expert.getEmail() , expert.getPassword());
-//        JSONObject json = new JSONObject();
-//        if(dbExpert==null){
-//            Date date = getDate();
-//            expert.setJoiningDate(date);
-//            expertRepoOld.save(expert);
-//            return  "{\"status\":\"success\"}";
-//        }
-//        else{
-//            System.out.println(expert.getQualification());
-//            return "{\"status\":\"failure\":\"Already Registered\"}";
-//        }
-//    }
-//
-//    private Date getDate(){
-//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        String formattedDate = formatter.format(new Date());
-//        try {
-//            return formatter.parse(formattedDate);
-//        } catch (ParseException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    public JSONObject getExpertByEmailAndPassword(Experts expert) {
-//        Experts dbExpert = expertRepoOld.findExpertByEmailAndPassword(expert.getEmail() , expert.getPassword());
-//        JSONObject json = new JSONObject();
-//        if(dbExpert != null){
-//            String token = JwtUtil.generateToken(dbExpert.getEmail());
-//            json.put("token" , token);
-//            Experts loggedInExpert = expertRepoOld.getExpertByExpertId(dbExpert.getId());
-//            json.put("expert" , loggedInExpert);
-//            json.put("status" , "success");
-//        }
-//        else{
-//
-//            json.put("status" , "failure");
-//            json.put("errorMsg" , "Incorrect UserName or Password");
-//        }
-//
-//        return json;
-//
-//    }
-//
-//    public List<Experts> getAllExpertsProfile() {
-//        return expertRepoOld.getAllExpertsProfile();
-//    }
-//
-//    public Experts getExpertByExpertId(Integer expertId) {
-//        return expertRepoOld.getExpertByExpertId(expertId);
-//    }
 }

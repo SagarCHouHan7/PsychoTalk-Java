@@ -2,9 +2,11 @@ package com.psychotalk.service.publicService;
 
 import com.psychotalk.dto.AccountDto.LoginRequest;
 import com.psychotalk.dto.AccountDto.RegisterResponse;
+import com.psychotalk.dto.publicDto.SnapshotsDto;
 import com.psychotalk.model.account.*;
 import com.psychotalk.repository.AccountRepo;
 import com.psychotalk.repository.ExpertRepo;
+import com.psychotalk.repository.QuestionRepo;
 import com.psychotalk.repository.UserRepo;
 import com.psychotalk.security.AccountDetailsService;
 import com.psychotalk.security.jwt.JwtUtil;
@@ -40,6 +42,8 @@ public class AccountService {
     private AccountDetailsService accountDetailsService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private QuestionRepo questionRepo;
 
     public RegisterResponse registerUser(User user) {
         Account account = accountRepo.findByUsername(user.getUsername().trim());
@@ -89,5 +93,13 @@ public class AccountService {
         else if (account instanceof Admin) response.put("role" , "ADMIN");
 
         return ResponseEntity.ok(response);
+    }
+
+    public SnapshotsDto getSnapshots() {
+        long totalExperts = expertRepo.count();
+        long totalAppointments = 0;
+        long totalMembers = userRepo.count();
+        long totalQuestions = questionRepo.count();
+        return SnapshotsDto.builder().totalAppointments(totalAppointments).totalExperts(totalExperts).totalQuestions(totalQuestions).totalMembers(totalMembers).build();
     }
 }

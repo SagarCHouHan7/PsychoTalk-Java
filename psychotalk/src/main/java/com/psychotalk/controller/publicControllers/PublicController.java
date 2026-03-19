@@ -2,18 +2,19 @@ package com.psychotalk.controller.publicControllers;
 
 import com.psychotalk.dto.AccountDto.RegisterResponse;
 import com.psychotalk.dto.PageResponseDto;
+import com.psychotalk.dto.publicDto.SnapshotsDto;
 import com.psychotalk.dto.expertDto.ExpertProfileDto;
+import com.psychotalk.dto.publicDto.TipDto;
 import com.psychotalk.model.account.Expert;
 import com.psychotalk.dto.AccountDto.LoginRequest;
 import com.psychotalk.model.account.User;
 import com.psychotalk.service.ExpertService;
 import com.psychotalk.service.publicService.AccountService;
+import com.psychotalk.service.publicService.TipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/public")
@@ -23,6 +24,8 @@ public class PublicController {
    private AccountService accountService;
     @Autowired
     private ExpertService expertService;
+    @Autowired
+    private TipService tipService;
 
     @PostMapping("/register/user")
     public ResponseEntity<?> registerUser(@RequestBody User user){
@@ -54,5 +57,16 @@ public class PublicController {
     @GetMapping("/getExpert/{id}")
     public ResponseEntity<ExpertProfileDto> getExpertByExpertId(@PathVariable("id") Long id){
         return ResponseEntity.ok(expertService.getExpertById(id));
+    }
+
+    @GetMapping("/snapshots")
+    public ResponseEntity<SnapshotsDto> getSnapshots(){
+
+        return ResponseEntity.ok(accountService.getSnapshots());
+    }
+
+    @GetMapping("/tip")
+    public ResponseEntity<TipDto> getTodayTip(){
+        return ResponseEntity.ok(tipService.getTip());
     }
 }
