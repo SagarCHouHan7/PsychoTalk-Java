@@ -1,14 +1,14 @@
 package com.psychotalk.dto.expertDto;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
-@Service
 public class ExpertVerificationRequestDto {
     private String fullName;
     private String email;
@@ -17,7 +17,9 @@ public class ExpertVerificationRequestDto {
     private Date dob;
     private List<String> qualifications;
     private String experience;
-    private double fees;
+    private int fees;
+    @JsonSetter(nulls = Nulls.SKIP)
+    private String currency = "INR";
     private String address;
     private String phoneNo;
 }

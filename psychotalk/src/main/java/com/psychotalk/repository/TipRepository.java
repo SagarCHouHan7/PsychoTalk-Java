@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class TipRepository {
+public interface TipRepository {
 
-    public final List<String> TIPS = List.of(
+    public static final List<String> TIPS = List.of(
             "Take 5 minutes to write down three things you're grateful for each morning. Gratitude journaling is proven to improve mood and reduce stress within two weeks of consistent practice.",
             "Practice deep breathing for 3 minutes daily: inhale for 4 counts, hold for 4, exhale for 6 counts slowly. This activates your parasympathetic nervous system to calm anxiety instantly.",
             "Go for a 10-minute walk outdoors every day and notice five things around you mindfully. Mindful walking reduces rumination and boosts serotonin levels naturally without medication.",
@@ -34,7 +34,7 @@ public class TipRepository {
             "Turn off all phone notifications for 30 minutes and focus deeply on one important task. Digital detoxes recharge your mental batteries and sharpen concentration for better results."
     );
 
-    public List<String> getTips(){
+    public static List<String> getTips(){
         return TIPS;
     }
 

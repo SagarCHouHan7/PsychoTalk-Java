@@ -118,6 +118,7 @@ public class ExpertService {
         expert.setAddress(dto.getAddress());
         expert.setAbout(dto.getAbout());
         expert.setFees(dto.getFees());
+        expert.setCurrency(dto.getCurrency());
         expert.setExperience(dto.getExperience());
         expert.setGender(dto.getGender());
         expert.setPhoneNo(dto.getPhoneNo());

@@ -4,10 +4,7 @@ import com.psychotalk.dto.AccountDto.LoginRequest;
 import com.psychotalk.dto.AccountDto.RegisterResponse;
 import com.psychotalk.dto.publicDto.SnapshotsDto;
 import com.psychotalk.model.account.*;
-import com.psychotalk.repository.AccountRepo;
-import com.psychotalk.repository.ExpertRepo;
-import com.psychotalk.repository.QuestionRepo;
-import com.psychotalk.repository.UserRepo;
+import com.psychotalk.repository.*;
 import com.psychotalk.security.AccountDetailsService;
 import com.psychotalk.security.jwt.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +41,8 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private QuestionRepo questionRepo;
+    @Autowired
+    private AppointmentRepo appointmentRepo;
 
     public RegisterResponse registerUser(User user) {
         Account account = accountRepo.findByUsername(user.getUsername().trim());
@@ -97,7 +96,7 @@ public class AccountService {
 
     public SnapshotsDto getSnapshots() {
         long totalExperts = expertRepo.count();
-        long totalAppointments = 0;
+        long totalAppointments = appointmentRepo.count();
         long totalMembers = userRepo.count();
         long totalQuestions = questionRepo.count();
         return SnapshotsDto.builder().totalAppointments(totalAppointments).totalExperts(totalExperts).totalQuestions(totalQuestions).totalMembers(totalMembers).build();

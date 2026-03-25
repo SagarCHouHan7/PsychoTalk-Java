@@ -19,15 +19,10 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 public class User extends Account{
-
-
     private String email;
-
     private String phone;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-
     @Temporal(TemporalType.DATE)
     private Date dob;
     private String gender;
