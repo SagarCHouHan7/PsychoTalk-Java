@@ -99,15 +99,23 @@ public class AnswerService {
     private AnswerResponseDto mapToAnswerResponseDto(Answer answer){
         AnswerResponseDto dto = new AnswerResponseDto();
         Account answeredBy = answer.getAnsweredBy();
-        if(answeredBy instanceof User) dto.setRole("USER");
-        else if(answeredBy instanceof Expert) dto.setRole("EXPERT");
-        dto.setAccountId(answeredBy.getId());
-        dto.setDisplayName(answeredBy.getUsername());
+        if(answeredBy instanceof  User){
+            dto.setRole("USER");
+            dto.setAccountId(answeredBy.getId());
+            dto.setDisplayName(answeredBy.getUsername());
+        }else if(answeredBy instanceof Expert){
+            dto.setRole("EXPERT");
+            dto.setAccountId(answeredBy.getId());
+            dto.setDisplayName(((Expert) answeredBy).getFullName());
+        }else{
+            dto.setRole("AI");
+            dto.setDisplayName("PsycheAI");
+        }
         dto.setId(answer.getId());
         dto.setLikes(answer.getLikes());
         dto.setCreatedAt(answer.getCreatedAt());
         dto.setUpdatedAt(answer.getUpdatedAt());
-        dto.setAnswer(answer.getAnswer().trim());
+        dto.setAnswer(answer.getAnswer());
         dto.setQuestionId(answer.getQuestion().getId());
         return  dto;
     }

@@ -6,7 +6,9 @@ import com.psychotalk.model.account.Account;
 import com.psychotalk.model.account.Expert;
 import com.psychotalk.model.mediaModels.ImageEntity;
 import com.psychotalk.repository.AccountRepo;
+import com.psychotalk.repository.ExpertRepo;
 import com.psychotalk.repository.ImageEntityRepo;
+import com.psychotalk.service.Utils.CurrentRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -34,6 +36,8 @@ public class MediaService {
     private AccountRepo accountRepo;
     @Autowired
     private ImageEntityRepo imageEntityRepo;
+    @Autowired
+    private CurrentRoleService currentRoleService;
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -44,12 +48,10 @@ public class MediaService {
         }
 
         String contentType = file.getContentType();
-        if(contentType == null || !contentType.startsWith("image/"))
-            throw new IllegalArgumentException("only images are excepted");
 
-        BufferedImage image1 = ImageIO.read(file.getInputStream());
-        if(image1 == null) throw  new IllegalArgumentException("file is not an image");
-
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Only image files allowed");
+        }
         Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
         Files.createDirectories(uploadPath);
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -63,7 +65,7 @@ public class MediaService {
         image.setUploadedAt(LocalDateTime.now());
         image.setFileName(fileName);
         image.setFilePath("/images/"+fileName);
-        image.setAccount(getCurrentAccount());
+        image.setAccount(currentRoleService.getCurrentExpert());
         return mapToImageEntityDto(imageEntityRepo.save(image));
     }
 
@@ -92,24 +94,23 @@ public class MediaService {
         dto.setId(save.getId());
         dto.setCaption(save.getCaption());
         dto.setAccountId(save.getAccount().getId());
-        dto.setUsername(save.getAccount().getUsername());
+        Expert expert;
+        try{
+            expert = (Expert) save.getAccount();
+            dto.setRole("EXPERT");
+            dto.setUsername(expert.getFullName());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         dto.setFileName(save.getFileName());
         dto.setFilePath(save.getFilePath());
         dto.setCommentCount(save.getCommentCount());
         dto.setLikeCount(save.getLikeCount());
         dto.setUploadedAt(save.getUploadedAt());
-        Account account = save.getAccount();
-        if(account instanceof Expert) dto.setRole("EXPERT");
         return dto;
     }
 
-    private Account getCurrentAccount(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        Account account =  accountRepo.findByUsername(username);
-        if(account == null) throw new RuntimeException("User not found");
-        return account;
-    }
+
 
 
 

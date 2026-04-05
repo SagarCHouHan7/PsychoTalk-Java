@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/answer/**" , "/api/media/access/**" , "/api/question/**").hasAnyRole("USER" , "EXPERT")
                         .requestMatchers("/api/media/**").hasRole("EXPERT")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/expert/**", "/appointment/expert").hasRole("EXPERT")
+                        .requestMatchers("/expert/**", "/appointment/expert/**").hasRole("EXPERT")
                         .requestMatchers("/user/**", "/appointment/user/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )

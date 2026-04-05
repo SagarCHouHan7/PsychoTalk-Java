@@ -1,19 +1,17 @@
 package com.psychotalk.service;
 
-
 import com.psychotalk.dto.PageResponseDto;
 import com.psychotalk.dto.expertDto.ExpertVerificationRequestDto;
 import com.psychotalk.dto.expertDto.ExpertProfileDto;
 import com.psychotalk.dto.expertDto.VerificationResponseDto;
 import com.psychotalk.model.account.Expert;
 import com.psychotalk.repository.ExpertRepo;
+import com.psychotalk.service.Utils.CurrentRoleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
@@ -28,27 +26,17 @@ public class ExpertService {
 
       @Autowired
       private ExpertRepo expertRepo;
+      @Autowired
+      private CurrentRoleService currentRoleService;
 
     public VerificationResponseDto getVerified(MultipartFile file, ExpertVerificationRequestDto dto) throws IOException {
-        if(getCurrentExpert().isVerificationSubmitted()){
+        if(currentRoleService.getCurrentExpert().isVerificationSubmitted()){
             VerificationResponseDto response = new VerificationResponseDto();
             response.setMessage("Please do not rerequest! Your request is under review. Admin will contact you soon.");
             response.setVerificationSubmitted(true);
             return response;
         }
-        if(file.getSize() > 5*1024*1024) throw  new IllegalArgumentException("File is too big");
-        String contentType = file.getContentType();
-        String originalFileName = file.getOriginalFilename();
-
-        if ((contentType == null ||
-                !contentType.equalsIgnoreCase("application/pdf")) &&
-                (originalFileName == null ||
-                        !originalFileName.toLowerCase().endsWith(".pdf"))) {
-
-            throw new RuntimeException("Only PDF files are allowed");
-        }
-        String uploadDir = "assets/uploads/documents";
-        Path uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
+        Path uploadPath = getPath(file);
         Files.createDirectories(uploadPath);
         String fileName = UUID.randomUUID()+"_"+file.getOriginalFilename();
         Path filePath = uploadPath.resolve(fileName);
@@ -65,8 +53,24 @@ public class ExpertService {
         return response;
     }
 
+    private static Path getPath(MultipartFile file) {
+        if(file.getSize() > 5*1024*1024) throw  new IllegalArgumentException("File is too big");
+        String contentType = file.getContentType();
+        String originalFileName = file.getOriginalFilename();
+
+        if ((contentType == null ||
+                !contentType.equalsIgnoreCase("application/pdf")) &&
+                (originalFileName == null ||
+                        !originalFileName.toLowerCase().endsWith(".pdf"))) {
+
+            throw new RuntimeException("Only PDF files are allowed");
+        }
+        String uploadDir = "assets/uploads/documents";
+        return Path.of(uploadDir).toAbsolutePath().normalize();
+    }
+
     public ExpertProfileDto getMyProfile(){
-        Expert expert = getCurrentExpert();
+        Expert expert = currentRoleService.getCurrentExpert();
         ExpertProfileDto dto = new ExpertProfileDto();
         BeanUtils.copyProperties(expert , dto);
         dto.setQualifications(expert.getQualification());
@@ -112,7 +116,7 @@ public class ExpertService {
     }
 
     private Expert mapDtoVerificationToExpert(ExpertVerificationRequestDto dto){
-        Expert expert = getCurrentExpert();
+        Expert expert = currentRoleService.getCurrentExpert();
         expert.setDob(dto.getDob());
         expert.setEmail(dto.getEmail());
         expert.setAddress(dto.getAddress());
@@ -127,11 +131,7 @@ public class ExpertService {
         return expert;
     }
 
-    private Expert getCurrentExpert(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return expertRepo.findByUsername(username).orElseThrow(()-> new RuntimeException("username not found"));
-    }
+
 
 
 }

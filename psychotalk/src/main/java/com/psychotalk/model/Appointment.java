@@ -42,11 +42,11 @@ public class Appointment {
     private String currency = "INR";
 
     @JoinColumn(name = "expert_id", nullable = false)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Expert expert;
 
     @JoinColumn(name = "user_id" , nullable = false)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
 

@@ -7,15 +7,14 @@ import com.psychotalk.model.Question;
 import com.psychotalk.model.account.User;
 import com.psychotalk.repository.QuestionRepo;
 import com.psychotalk.repository.UserRepo;
+import com.psychotalk.service.Utils.CurrentRoleService;
 import jakarta.transaction.Transactional;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,12 +23,18 @@ import java.util.List;
 @Service
 public class QuestionService {
     @Autowired
-    QuestionRepo questionRepo;
+    private QuestionRepo questionRepo;
     @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
+    @Autowired
+    private CurrentRoleService currentRoleService;
+    @Autowired
+    private ChatClient chatClient;
+    @Autowired
+    private AIResponseService aiResponseService;
 
     public QuestionResponseDto createQuestion(CreateQuestionDto questionDto){
-        User user = getCurrentUser();
+        User user = currentRoleService.getCurrentUser();
         if(questionRepo.existsQuestionByStatementAndUser(questionDto.getQuestion() , user)){
             throw new RuntimeException("Question already exists");
         }
@@ -41,7 +46,11 @@ public class QuestionService {
         question.setModifiedTime(LocalDateTime.now());
         question.setUser(user);
         question.setUsername(user.getUsername());
-        return mapQuestionResponseDto(questionRepo.save(question));
+        Question saved = questionRepo.save(question);
+        // async job done here : AI response will generate and save in DB
+        aiResponseService.getAIAnswerAndSaveInDB(saved);
+
+        return mapQuestionResponseDto(saved);
     }
 
     public QuestionResponseDto getQuestionById(long id){
@@ -61,7 +70,7 @@ public class QuestionService {
     }
 
     public Object getMyQuestions(int page, int size) {
-        User user = getCurrentUser();
+        User user = currentRoleService.getCurrentUser();
         Pageable pageable = PageRequest.of(page , size , Sort.by("createdTime").descending());
 
         Page<Question> questionPage = questionRepo.findByUser(user.getId() , pageable);
@@ -77,7 +86,7 @@ public class QuestionService {
     @Transactional
     public QuestionResponseDto updateQuestionById(long id, String questionStatement) {
         Question question = questionRepo.findById(id).orElseThrow(()->new RuntimeException("question doesn't exists"));
-        User user = getCurrentUser();
+        User user = currentRoleService.getCurrentUser();
         if(!question.getUser().getId().equals(user.getId())) throw new RuntimeException("Anonymous update not allowed");
         question.setModifiedTime(LocalDateTime.now());
         question.setQuestion(questionStatement);
@@ -85,10 +94,11 @@ public class QuestionService {
     }
 
     @Transactional
-    public void deleteById(Long id) {
+    public boolean deleteById(Long id) {
         Question question = questionRepo.findById(id).orElseThrow(()-> new RuntimeException("question doesn't exists"));
-        if(! question.getUser().getId().equals(getCurrentUser().getId())) throw new RuntimeException("Anonymous deletion not allowed");
+        if(! question.getUser().getId().equals(currentRoleService.getCurrentUser().getId())) throw new RuntimeException("Anonymous deletion not allowed");
         questionRepo.delete(question);
+        return true;
     }
 
     private QuestionResponseDto mapQuestionResponseDto(Question question){
@@ -115,10 +125,5 @@ public class QuestionService {
             return dto;
     }
 
-    private User getCurrentUser(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return userRepo.findByUsername(username).orElseThrow(()-> new RuntimeException("user not found"));
-    }
 
 }

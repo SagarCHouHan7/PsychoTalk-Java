@@ -13,15 +13,12 @@ import org.springframework.web.bind.annotation.*;
 public class QuestionController {
 
     @Autowired
-    QuestionService questionService;
+    private QuestionService questionService;
 
     @PostMapping("/post")
-    private ResponseEntity<?> createQuestion(@RequestBody CreateQuestionDto question){
+    private ResponseEntity<QuestionResponseDto> createQuestion(@RequestBody CreateQuestionDto question){
         QuestionResponseDto question1 = questionService.createQuestion(question);
-        if(question1 != null)
-            return new ResponseEntity<>(question1 , HttpStatus.CREATED);
-        else
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(question1 , HttpStatus.CREATED);
     }
 
     @GetMapping("/getMy")
@@ -38,8 +35,8 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteById(@PathVariable("id") Long id){
-        questionService.deleteById(id);
-        return ResponseEntity.noContent().build();
+    private ResponseEntity<?> deleteById(@PathVariable("id") Long id){
+
+        return ResponseEntity.ok(questionService.deleteById(id));
     }
 }

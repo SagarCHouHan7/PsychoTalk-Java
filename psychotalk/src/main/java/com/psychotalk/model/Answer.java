@@ -4,12 +4,14 @@ import com.psychotalk.model.account.Account;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
+@ToString
 public class Answer {
 
     @Id
@@ -19,12 +21,12 @@ public class Answer {
     @Column(name = "answer" , length = 40000)
     private String answer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id" , nullable = false)
     Question question;
 
     @ManyToOne
-    @JoinColumn(name = "answered_by_account_id" , nullable = false)
+    @JoinColumn(name = "answered_by_account_id" , nullable = true)
     private Account answeredBy;
 
     private LocalDateTime createdAt;
