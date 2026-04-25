@@ -1,7 +1,10 @@
 package com.psychotalk.model.account;
 
+import com.psychotalk.model.Notification;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "account")
@@ -22,5 +25,12 @@ public abstract class Account {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(
+            mappedBy = "account",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY
+    )
+    List<Notification> notifications;
 
 }

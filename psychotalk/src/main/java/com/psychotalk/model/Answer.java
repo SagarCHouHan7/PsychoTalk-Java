@@ -23,7 +23,7 @@ public class Answer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id" , nullable = false)
-    Question question;
+    private Question question;
 
     @ManyToOne
     @JoinColumn(name = "answered_by_account_id" , nullable = true)

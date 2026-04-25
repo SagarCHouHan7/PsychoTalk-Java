@@ -7,6 +7,7 @@ import com.psychotalk.model.Question;
 import com.psychotalk.model.account.User;
 import com.psychotalk.repository.QuestionRepo;
 import com.psychotalk.repository.UserRepo;
+import com.psychotalk.service.AIservices.AIResponseService;
 import com.psychotalk.service.Utils.CurrentRoleService;
 import jakarta.transaction.Transactional;
 import org.springframework.ai.chat.client.ChatClient;

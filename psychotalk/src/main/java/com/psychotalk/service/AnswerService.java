@@ -11,14 +11,14 @@ import com.psychotalk.model.account.User;
 import com.psychotalk.repository.AccountRepo;
 import com.psychotalk.repository.AnswerRepo;
 import com.psychotalk.repository.QuestionRepo;
+import com.psychotalk.service.AIservices.ModerationService;
+import com.psychotalk.service.Utils.CurrentRoleService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,9 +32,13 @@ public class AnswerService {
     private AnswerRepo answerRepo;
     @Autowired
     private QuestionRepo questionRepo;
+    @Autowired
+    private ModerationService moderationService;
+    @Autowired
+    private CurrentRoleService currentRoleService;
 
     public AnswerResponseDto postAnswer(CreateAnswerDto answer) {
-        Account account = getCurrentAccount();
+        Account account = currentRoleService.getCurrentAccount();
         Question question = questionRepo.findById(answer.getQuestionId()).orElseThrow(()->new RuntimeException("Question doesn't exist"));
         if( answer.getAnswer() == null || answer.getAnswer().trim().isEmpty()) throw new RuntimeException("Empty post not allowed");
 
@@ -47,8 +51,12 @@ public class AnswerService {
         newAnswer.setLikes(0);
 
         Answer save = answerRepo.save(newAnswer);
+
+
         question.setAnswerCount(question.getAnswerCount()+1);
         questionRepo.save(question);
+        //async call
+        moderationService.checkViolationPolicy(save, question, account);
 
         return mapToAnswerResponseDto(save);
 
@@ -67,7 +75,7 @@ public class AnswerService {
     @Transactional
     public AnswerResponseDto updateMyAnswer(long id, CreateAnswerDto answer) {
         Answer answer1 = answerRepo.findById(id).orElseThrow(()->new RuntimeException("answer doesn't exist"));
-        Account account = getCurrentAccount();
+        Account account = currentRoleService.getCurrentAccount();
         if(!answer1.getAnsweredBy().getUsername().equals(account.getUsername())) throw new RuntimeException("Answer doesn't belongs to current user");
         answer1.setUpdatedAt(LocalDateTime.now());
         answer1.setAnswer(answer.getAnswer());
@@ -76,7 +84,7 @@ public class AnswerService {
 
     @Transactional
     public void deleteAnswerById(Long id) {
-        Account account = getCurrentAccount();
+        Account account = currentRoleService.getCurrentAccount();
         Answer answer = answerRepo.findById(id).orElseThrow(()-> new RuntimeException("answer doesn't exist"));
         Question question = questionRepo.findById(answer.getQuestion().getId()).orElseThrow(()-> new RuntimeException("parent doesn't exists"));
         if(!answer.getAnsweredBy().getUsername().equals(account.getUsername())) throw new RuntimeException("Answer doesn't belongs to current user");
@@ -120,13 +128,8 @@ public class AnswerService {
         return  dto;
     }
 
-    private Account getCurrentAccount(){
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        Account account =  accountRepo.findByUsername(username);
-        if(account == null) throw new RuntimeException("username not found");
-        return account;
-    }
+
+
 
 }
 

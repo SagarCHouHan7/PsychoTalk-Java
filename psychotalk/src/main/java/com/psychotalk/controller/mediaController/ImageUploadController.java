@@ -1,8 +1,7 @@
 package com.psychotalk.controller.mediaController;
 
 import com.psychotalk.dto.mediaDto.ImageResponseDto;
-import com.psychotalk.model.account.User;
-import com.psychotalk.service.mediaService.MediaService;
+import com.psychotalk.service.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

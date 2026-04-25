@@ -1,12 +1,10 @@
-package com.psychotalk.service.mediaService;
+package com.psychotalk.service;
 
 import com.psychotalk.dto.PageResponseDto;
 import com.psychotalk.dto.mediaDto.ImageResponseDto;
-import com.psychotalk.model.account.Account;
 import com.psychotalk.model.account.Expert;
 import com.psychotalk.model.mediaModels.ImageEntity;
 import com.psychotalk.repository.AccountRepo;
-import com.psychotalk.repository.ExpertRepo;
 import com.psychotalk.repository.ImageEntityRepo;
 import com.psychotalk.service.Utils.CurrentRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

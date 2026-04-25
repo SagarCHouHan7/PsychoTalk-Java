@@ -1,4 +1,4 @@
-package com.psychotalk.service;
+package com.psychotalk.service.AIservices;
 
 import com.psychotalk.model.Answer;
 import com.psychotalk.model.Question;
